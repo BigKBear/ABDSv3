@@ -215,10 +215,44 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                 final String password = etPassword.getText().toString();
                 showConfirm_password();
 
-                if (!password.equals("")) {
+                PasswordValidator validator = PasswordValidator.buildValidator(true,false, false, 6, 16);
 
+                if(validator.validatePassword(password)){
+                    if(validator.validatePassword(confirmPassword)){
+                        if (password.matches(confirmPassword)) {
+                            if (password.equals(confirmPassword)) {
+                                prefs.edit().putString("username", username).apply();
+                                prefs.edit().putString("password", password).apply();
+                                //SavePreferences("Password", password1);
+                                Intent intent = new Intent(RegistrationActivity.this, SecurityQuestionsActivity.class);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                                finish();
+                            }else {
+                                etPassword.setText("");
+                                etConfirmPassword.setText("");
+                                Toast.makeText(RegistrationActivity.this, "Not equal", Toast.LENGTH_LONG).show();
+                            }
+                        }else {
+                            etPassword.setText("");
+                            etConfirmPassword.setText("");
+                            Toast.makeText(RegistrationActivity.this, "Does not match", Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        etPassword.setText("");
+                        etConfirmPassword.setText("");
+                        Toast.makeText(RegistrationActivity.this, "Confirmation password error", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    etPassword.setText("");
+                    etConfirmPassword.setText("");
+                    Toast.makeText(RegistrationActivity.this, "Create Stronger password", Toast.LENGTH_LONG).show();
+                }
+
+
+             /*   if (!password.equals("")) {
                     if (password.length() >= 8) {
-                        Pattern pattern = Pattern.compile("[[^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])[0-9A-Za-z]{15,}$]]");
+                        Pattern pattern = Pattern.compile("s");
                         Matcher matcher = pattern.matcher(password);
 
                         if (matcher.matches()) {
@@ -239,7 +273,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                         } else {
                             etPassword.setText("");
                             etConfirmPassword.setText("");
-                            Toast.makeText(RegistrationActivity.this, "Not matched", Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegistrationActivity.this, "Not matched " + String.valueOf(matcher.matches()), Toast.LENGTH_LONG).show();
                         }
                     } else {
                         etPassword.setText("");
@@ -250,7 +284,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                     etPassword.setText("");
                     etConfirmPassword.setText("");
                     Toast.makeText(RegistrationActivity.this, "Nothing", Toast.LENGTH_LONG).show();
-                }
+                }*/
                 /*
                 if ((username.matches("")) || (password.matches("")) || (confirmPassword.matches(""))) {
                     Toast.makeText(getApplicationContext(), " Please enter username, password and confirm password", Toast.LENGTH_LONG).show();
