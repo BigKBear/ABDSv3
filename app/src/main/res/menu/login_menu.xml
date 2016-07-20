@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/login_web_version_upgrade"
+        android:title="Check for Update"
+        android:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/login_web_version_upgrade"
+        android:title="Upgrade to Web Version"
+        android:showAsAction="always" />
+
+</menu>

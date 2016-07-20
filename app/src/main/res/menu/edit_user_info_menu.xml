@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/edit_user_info_view_all_files"
+        android:title="View Files"
+        android:orderInCategory="100"
+        android:showAsAction="always" />
+
+    <item
+        android:id="@+id/edit_user_info_save"
+        android:title="Save"
+        android:orderInCategory="100"
+        android:showAsAction="always" />
+
+    <item
+        android:id="@+id/edit_user_info_cancel_changes"
+        android:title="Cancel"
+        android:orderInCategory="100"
+        android:showAsAction="always" />
+</menu>
