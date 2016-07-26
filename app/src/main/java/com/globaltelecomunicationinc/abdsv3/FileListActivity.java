@@ -40,6 +40,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class FileListActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int SELECT_PICTURE = 1;
+    private static final int REQUEST_TAKE_GALLERY_VIDEO = 1;
     final int GALLERY_REQUEST = 22131;
     private String selectedImagePath;
     String selectedPhoto;
@@ -136,7 +137,10 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             case R.id.btnVideos:
                 Intent photoLibraryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 photoLibraryIntent.setType("video/*");
-                startActivityForResult(photoLibraryIntent, 1);
+                photoLibraryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(photoLibraryIntent,"Select Video"),REQUEST_TAKE_GALLERY_VIDEO);
+
+//                startActivityForResult(photoLibraryIntent, 1);
                 //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
                 break;
             case R.id.btnAllFiles:
@@ -309,6 +313,56 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 } else {
                     Log.i("No Gallery", "request");
                 }
+                break;
+            case REQUEST_TAKE_GALLERY_VIDEO:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImageUri = data.getData();
+                    String videoPath = getPath(selectedImageUri).toString();
+                    Log.i("In put path",videoPath);
+                    try{
+                        // OI FILE Manager
+                        String filemanagerstring = selectedImageUri.getPath();
+                        Log.i("Input file Manager",filemanagerstring);
+                        // MEDIA GALLERY
+                        selectedImagePath = getPath(selectedImageUri);
+                        if (selectedImagePath != null) {
+                            File filepath = Environment.getExternalStorageDirectory();
+                            String inputPath = filepath.getAbsolutePath().toString() + "/ABDSv3toencode/";
+
+                            File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                            String outputPath = downloadpath.getAbsolutePath().toString() + "/";
+                            Log.i("Output path",inputPath);
+                            moveFile( videoPath, filemanagerstring,  inputPath);
+                            /*Intent intent = new Intent(FileListActivity.this,
+                                    VideoplayAvtivity.class);
+                            intent.putExtra("path", selectedImagePath);
+                            startActivity(intent);*//*
+
+                            File filepath = Environment.getExternalStorageDirectory();
+                            //file name that the images will be saved under
+                            File dir = new File(filepath.getAbsolutePath() + "/ABDSv3toencode");
+                            dir.mkdirs();
+
+                            File file = new File(dir, "myvideo.mp4");
+                            File f = new File(filemanagerstring);
+
+                            String imageName = f.getName();*/
+                        }else{
+                            Log.i("No Video", "request");
+                        }
+
+                    }catch(Exception e){
+                        Toast.makeText(getApplicationContext(),
+                                "Something went wrong while choosing video", Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }else{
+                    Toast.makeText(getApplicationContext(),
+                            "Something went wrong while making video request", Toast.LENGTH_SHORT
+                    ).show();
+                }
+
+
                 break;
         }
     }
