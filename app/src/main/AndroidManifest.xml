@@ -22,6 +22,7 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".SecurityQuestionsActivity" />
         <activity android:name=".FileListActivity"></activity>
+        <activity android:name=".FileAndDirectoryActivity"></activity>
     </application>
 
 </manifest>

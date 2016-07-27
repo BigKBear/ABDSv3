@@ -39,10 +39,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class FileListActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int SELECT_PICTURE = 1;
+    //private static final int SELECT_PICTURE = 1;
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 1;
     final int GALLERY_REQUEST = 22131;
-    private String selectedImagePath;
     String selectedPhoto;
 
     SharedPreferences prefs = null;
@@ -85,16 +84,16 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         setListeners();
 
         prefs = this.getSharedPreferences("com.globaltelecomunicationinc.abdsv3", MODE_PRIVATE);
-        btnEncryptDecrypt.setText("Decrypt");
+        btnEncryptDecrypt.setText(R.string.decrypt);
         mode = 2;
 
         tvFileListLabel.setGravity(Gravity.CENTER_HORIZONTAL);
         if (mode == 2) {
-            tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Decrypted files");
-            btnEncryptDecrypt.setText("Encrypt");
+            tvFileListLabel.setText(String.format("All %s's Decrypted files", prefs.getString("username", "")));
+            btnEncryptDecrypt.setText(R.string.encrypt);
         } else {
-            tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Encrypted files");
-            btnEncryptDecrypt.setText("Decrypt");
+            tvFileListLabel.setText(String.format("All %s's Encrypted files", prefs.getString("username", "")));
+            btnEncryptDecrypt.setText(R.string.decrypt);
         }
 
         /*ivGallery.setOnClickListener(new View.OnClickListener() {
@@ -110,13 +109,13 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         switch (view.getId()) {
             case R.id.btnEncryptedFiles:
                 mode = 1;
-                tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Encrypted files");
-                btnEncryptDecrypt.setText("Decrypt");
+                tvFileListLabel.setText(String.format("All %s's Encrypted files", prefs.getString("username", "")));
+                btnEncryptDecrypt.setText(R.string.decrypt);
                 break;
             case R.id.btnDencryptedFiles:
                 mode = 2;
-                tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Decrypted files");
-                btnEncryptDecrypt.setText("Encrypt");
+                tvFileListLabel.setText(String.format("All %s's Decrypted files", prefs.getString("username", "")));
+                btnEncryptDecrypt.setText(R.string.encrypt);
                 break;
             case R.id.ivGallery:
                 startActivityForResult(galleryPhoto.openGalleryIntent(), GALLERY_REQUEST);
@@ -146,9 +145,33 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             case R.id.btnAllFiles:
                 //Set all files for encryption
                 if(isExternalStorageAvailable()){
-                    Toast.makeText(getApplicationContext(),
+                    /*Toast.makeText(getApplicationContext(),
                             "SD card present", Toast.LENGTH_SHORT
-                    ).show();
+                    ).show();*/
+
+
+                   /* Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("file*//*");
+                    startActivityForResult(intent, GALLERY_REQUEST);*/
+
+                  /*  final int FILE_SELECT_CODE = 0;
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);*/
+                    //intent.setType("**/*//*");
+                  /*  intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                    try {
+                        startActivityForResult(
+                                Intent.createChooser(intent, "Select a File to Upload"),
+                                FILE_SELECT_CODE);
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        // Potentially direct the user to the Market with a Dialog
+                        Toast.makeText(this, "Please install a File Manager.",
+                                Toast.LENGTH_SHORT).show();
+                    }*/
+
+                    i = new Intent(FileListActivity.this, FileAndDirectoryActivity.class);
+                    startActivity(i);
+                    overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
                 }else{
                     Toast.makeText(getApplicationContext(),
                             "NO SDcard", Toast.LENGTH_SHORT
@@ -179,9 +202,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                                     File filepath = Environment.getExternalStorageDirectory();
                                     File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                                     //file name that the images will be saved under
-                                    String inputPath = filepath.getAbsolutePath().toString() + "/ABDStoencode/";
+                                    String inputPath = filepath.getAbsolutePath() + "/ABDStoencode/";
 
-                                    String outputPath = downloadpath.getAbsolutePath().toString() + "/";
+                                    String outputPath = downloadpath.getAbsolutePath() + "/";
 
                                     String inputFile = "myimage.png";
                                     //moveFile(inputPath,  inputFile, outputPath);
@@ -258,12 +281,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             mExternalStorageAvailable = mExternalStorageWriteable = false;
         }
 
-        if (mExternalStorageAvailable == true
-                && mExternalStorageWriteable == true) {
-            return true;
-        } else {
-            return false;
-        }
+        return mExternalStorageAvailable && mExternalStorageWriteable;
     }
 
     @Override
@@ -274,7 +292,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 if (resultCode == RESULT_OK) {
                     Bitmap bitmap = null;
                     Uri selectedImageUri = data.getData();
-                    String photoPath = getPath(selectedImageUri).toString();
+                    String photoPath = getPath(selectedImageUri);
                     selectedPhoto = photoPath;
                 /*Uri photoPath = galleryPhoto.getPhotoUri();
                 selectedPhoto = photoPath;
@@ -317,20 +335,20 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             case REQUEST_TAKE_GALLERY_VIDEO:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImageUri = data.getData();
-                    String videoPath = getPath(selectedImageUri).toString();
+                    String videoPath = getPath(selectedImageUri);
                     Log.i("In put path",videoPath);
                     try{
                         // OI FILE Manager
                         String filemanagerstring = selectedImageUri.getPath();
                         Log.i("Input file Manager",filemanagerstring);
                         // MEDIA GALLERY
-                        selectedImagePath = getPath(selectedImageUri);
+                        String selectedImagePath = getPath(selectedImageUri);
                         if (selectedImagePath != null) {
                             File filepath = Environment.getExternalStorageDirectory();
-                            String inputPath = filepath.getAbsolutePath().toString() + "/ABDSv3toencode/";
+                            String inputPath = filepath.getAbsolutePath() + "/ABDSv3toencode/";
 
                             File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                            String outputPath = downloadpath.getAbsolutePath().toString() + "/";
+                            String outputPath = downloadpath.getAbsolutePath() + "/";
                             Log.i("Output path",inputPath);
                             moveFile( videoPath, filemanagerstring,  inputPath);
                             /*Intent intent = new Intent(FileListActivity.this,

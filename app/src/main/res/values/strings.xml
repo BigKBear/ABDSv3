@@ -4,4 +4,6 @@
     <string name="first_time_use_message">Welcome! \n first time users must create a password that will be used to encrpte selected files.</string>
     <string name="never_registered_user_message">Welcome Again! \n You did not complete registration. Please complete it now.</string>
     <string name="user_forgot_password_message">Welcome Again! \n Try not to forget your password this time.</string>
+    <string name="decrypt">Decrypt</string>
+    <string name="encrypt">Encrypt</string>
 </resources>
