@@ -1,5 +1,6 @@
 package com.globaltelecomunicationinc.abdsv3;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -41,6 +43,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
     //private static final int SELECT_PICTURE = 1;
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 1;
+    private static final int FILE_SELECT_CODE = 0;
     final int GALLERY_REQUEST = 22131;
     String selectedPhoto;
 
@@ -154,10 +157,10 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                     intent.setType("file*//*");
                     startActivityForResult(intent, GALLERY_REQUEST);*/
 
-                  /*  final int FILE_SELECT_CODE = 0;
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);*/
-                    //intent.setType("**/*//*");
-                  /*  intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    final int FILE_SELECT_CODE = 0;
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("*/*");
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
 
                     try {
                         startActivityForResult(
@@ -167,15 +170,14 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                         // Potentially direct the user to the Market with a Dialog
                         Toast.makeText(this, "Please install a File Manager.",
                                 Toast.LENGTH_SHORT).show();
-                    }*/
-
-                    i = new Intent(FileListActivity.this, FileAndDirectoryActivity.class);
+                    }
+                    /*i = new Intent(FileListActivity.this, FileAndDirectoryActivity.class);
                     startActivity(i);
                     overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
                 }else{
                     Toast.makeText(getApplicationContext(),
                             "NO SDcard", Toast.LENGTH_SHORT
-                    ).show();
+                    ).show();*/
                 }
                 break;
             case R.id.btnEncryptDecrypt:
@@ -202,7 +204,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                                     File filepath = Environment.getExternalStorageDirectory();
                                     File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                                     //file name that the images will be saved under
-                                    String inputPath = filepath.getAbsolutePath() + "/ABDStoencode/";
+                                    String inputPath = filepath.getAbsolutePath() + "/ABDSv3toencode/";
 
                                     String outputPath = downloadpath.getAbsolutePath() + "/";
 
@@ -292,7 +294,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 if (resultCode == RESULT_OK) {
                     Bitmap bitmap = null;
                     Uri selectedImageUri = data.getData();
-                    String photoPath = getPath(selectedImageUri);
+                    String photoPath = getPath1(selectedImageUri);
                     selectedPhoto = photoPath;
                 /*Uri photoPath = galleryPhoto.getPhotoUri();
                 selectedPhoto = photoPath;
@@ -332,17 +334,35 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                     Log.i("No Gallery", "request");
                 }
                 break;
+            case FILE_SELECT_CODE:
+                if (resultCode == RESULT_OK) {
+                    // Get the Uri of the selected file 
+                    Uri uri = data.getData();
+                    Log.i("TAG", "File Uri: " + uri.toString());
+                    // Get the path
+                    String path = null;
+                    try {
+                        path = getPathGo(this, uri);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("TAG", "File Path: " + path);
+                    // Get the file instance
+                    // File file = new File(path);
+                    // Initiate the upload
+                }
+                break;
             case REQUEST_TAKE_GALLERY_VIDEO:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImageUri = data.getData();
-                    String videoPath = getPath(selectedImageUri);
+                    String videoPath = getPath1(selectedImageUri);
                     Log.i("In put path",videoPath);
                     try{
                         // OI FILE Manager
                         String filemanagerstring = selectedImageUri.getPath();
                         Log.i("Input file Manager",filemanagerstring);
                         // MEDIA GALLERY
-                        String selectedImagePath = getPath(selectedImageUri);
+                        String selectedImagePath = getPath1(selectedImageUri);
                         if (selectedImagePath != null) {
                             File filepath = Environment.getExternalStorageDirectory();
                             String inputPath = filepath.getAbsolutePath() + "/ABDSv3toencode/";
@@ -382,13 +402,14 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
 
                 break;
+
         }
     }
 
     /**
      * helper to retrieve the path of an image URI
      */
-    public String getPath(Uri uri) {
+    public String getPath1(Uri uri) {
         // just some safety built in
         if( uri == null ) {
             // TODO perform some logging or show user feedback
@@ -406,6 +427,28 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         }
         // this is our fallback here
         return uri.getPath();
+    }
+
+    public static String getPathGo(Context context, Uri uri) throws URISyntaxException {
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = { "_data" };
+            Cursor cursor = null;
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
+                int column_index = cursor.getColumnIndexOrThrow("_data");
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+                // Eat it
+            }
+        }
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
     }
 
     void encryptFile(String inputPath, String inputFile, String outputPath) {

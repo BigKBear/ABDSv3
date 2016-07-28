@@ -16,18 +16,23 @@ public class FileAndDirectoryActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        File root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+
+        File root = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+        File root1 = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+
         ListDir(root);
+        ListDir(root1);
         //setContentView(R.layout.activity_file_and_directory);
     }
 
-    void ListDir(File f){
+    void ListDir(File f) {
         File[] files = f.listFiles();
         fileList.clear();
-        for (File file : files){
+        for (File file : files) {
             fileList.add(file.getPath());
         }
-        ArrayAdapter<String> directoryList = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileList);
+        ArrayAdapter<String> directoryList = new ArrayAdapter<String>
+                (this, android.R.layout.simple_list_item_1, fileList);
         setListAdapter(directoryList);
     }
 }
