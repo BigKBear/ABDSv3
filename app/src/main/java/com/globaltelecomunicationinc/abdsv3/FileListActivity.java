@@ -510,7 +510,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             fos.close();
             cis.close();
             Toast.makeText(getApplicationContext(),
-                    "files decrypted and saved to SD card", Toast.LENGTH_LONG
+                    "files decrypted and saved to " + outputPath, Toast.LENGTH_LONG
             ).show();
         }catch (Exception e){
             Toast.makeText(getApplicationContext(),
