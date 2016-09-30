@@ -37,6 +37,8 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.SecretKeySpec;
 
+import static android.R.id.input;
+
 public class FileListActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int SELECT_PICTURE = 1;
@@ -157,19 +159,26 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 alertDialog.setMessage("Enter Password");
 
                 final EditText input = new EditText(FileListActivity.this);
+                //final EditText file_name = new EditText(FileListActivity.this);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT);
                 input.setLayoutParams(lp);
+
+
+                //file_name.setLayoutParams(lp);
                 input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                //file_name.setInputType(InputType.TYPE_CLASS_TEXT);
                 //alertDialog.setView(input); // uncomment this line
                 alertDialog.setView(input);
+                //alertDialog.setView(file_name);
                 alertDialog.setIcon(R.drawable.key);
 
                 alertDialog.setPositiveButton("Enter",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 String password = input.getText().toString();
+                                //String filename = file_name.getText().toString();
                                 //if (password.matches("")) {
                                 if (prefs.getString("password", "").matches(password)) {
                                     File filepath = Environment.getExternalStorageDirectory();
@@ -179,7 +188,8 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
                                     String outputPath = downloadpath.getAbsolutePath().toString() + "/";
 
-                                    String inputFile = "myimage.png";
+                                    String inputFile = "myimage.png";//TODO:ask for file name to save file as from the user
+                                    //String inputFile = filename;
                                     //moveFile(inputPath,  inputFile, outputPath);
                                     if(mode == 2){
                                         encryptFile(inputPath, inputFile, outputPath);
@@ -312,6 +322,38 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
     }
+/*
+
+    public String getFileName(){
+        alertDialog.setPositiveButton("Enter",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String filename = input.getText().toString();
+                        //if (password.matches("")) {
+                        if (prefs.getString("filename", "").matches("")) {
+                            return filename;
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "no file name provided!", Toast.LENGTH_SHORT).show();
+                        }
+                               */
+/* }else {
+                                    Toast.makeText(getApplicationContext(),
+                                            "No Password Entered!", Toast.LENGTH_SHORT).show();
+                                }*//*
+
+                    }
+                });
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+
+    }
+*/
 
     /**
      * helper to retrieve the path of an image URI
@@ -367,7 +409,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             cos.close();
             fis.close();
             Toast.makeText(getApplicationContext(),
-                    "files encrypted and saved to SD card", Toast.LENGTH_LONG
+                    "file "+inputFile+" encrypted and saved to SD card", Toast.LENGTH_LONG
             ).show();
         }catch (Exception e){
             Toast.makeText(getApplicationContext(),
@@ -395,7 +437,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             fos.close();
             cis.close();
             Toast.makeText(getApplicationContext(),
-                    "files decrypted and saved to SD card", Toast.LENGTH_LONG
+                    "file "+ inputFile +" decrypted and saved to SD card", Toast.LENGTH_LONG
             ).show();
         }catch (Exception e){
             Toast.makeText(getApplicationContext(),
