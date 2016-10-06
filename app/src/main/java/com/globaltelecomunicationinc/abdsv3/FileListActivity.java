@@ -42,11 +42,15 @@ import static android.R.id.input;
 public class FileListActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int SELECT_PICTURE = 1;
+    //Set the request codes for the results returned from Photos, Videos, Music and All files
     final int GALLERY_REQUEST = 22131;
     final int REQUEST_TAKE_GALLERY_VIDEO = 42831;
     final int REQUEST_GET_MUSIC = 1;
     final int FILE_SELECT_CODE = 22341;
+
+    //global variable for the selected file NAME for encryption of decryption
     String selectedFileName ="";
+    //global variable for the selected file PATH for encryption of decryption
     private String selectedFilePath;
     String selectedPhoto;
 
@@ -314,14 +318,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                     Bitmap bitmap = null;
                     Uri selectedImageUri = data.getData();
                     String photoPath = getPath(selectedImageUri).toString();
-                    selectedPhoto = photoPath;
-                /*Uri photoPath = galleryPhoto.getPhotoUri();
-                selectedPhoto = photoPath;
-                Uri uri = data.getData();
-                galleryPhoto.setPhotoUri(uri);
-                selectedPhoto = galleryPhoto.getPath();*/
+                    selectedFileName = photoPath;
                     try{
-                        bitmap = ImageLoader.init().from(selectedPhoto).requestSize(512, 512).getBitmap();
+                        bitmap = ImageLoader.init().from(selectedFileName).requestSize(512, 512).getBitmap();
                         //ivImage.setImageBitmap(bitmap);
                         File filepath = Environment.getExternalStorageDirectory();
                         //file name that the images will be saved under
