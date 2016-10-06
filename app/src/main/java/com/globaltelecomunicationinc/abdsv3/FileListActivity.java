@@ -45,6 +45,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
     final int GALLERY_REQUEST = 22131;
     final int REQUEST_TAKE_GALLERY_VIDEO = 42831;
     final int REQUEST_GET_MUSIC = 1;
+    final int FILE_SELECT_CODE = 22341;
     String selectedFileName ="";
     private String selectedFilePath;
     String selectedPhoto;
@@ -187,9 +188,19 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             case R.id.btnAllFiles:
                 //Set all files for encryption
                 if(isExternalStorageAvailable()){
-                    Toast.makeText(getApplicationContext(),
-                            "SD card present", Toast.LENGTH_SHORT
-                    ).show();
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("*/*");
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                    try {
+                        startActivityForResult(
+                                Intent.createChooser(intent, "Select a File to Upload"),
+                                FILE_SELECT_CODE);
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        // Potentially direct the user to the Market with a Dialog
+                        Toast.makeText(this, "Please install a File Manager.",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }else{
                     Toast.makeText(getApplicationContext(),
                             "NO SDcard", Toast.LENGTH_SHORT
@@ -392,6 +403,24 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                                     "Video " + selectedFileName + " selected", Toast.LENGTH_SHORT
                             ).show();
                         }
+                    }
+                }
+                break;
+            case FILE_SELECT_CODE:
+                if (resultCode == RESULT_OK) {
+                    // Get the Uri of the selected file
+                    Uri uri = data.getData();
+                    Log.e("TAG", "File Uri: " + uri.toString());
+                    // Get the path
+                    selectedFilePath = getPath(uri);
+                    Log.e("TAG", "File Path: " + selectedFilePath);
+                    if (selectedFilePath != null) {
+                        // Get the file instance
+                        File f = new File(selectedFilePath);
+                        selectedFileName = f.getName();
+                        Toast.makeText(getApplicationContext(),
+                                "User selected " + selectedFileName + " file from file explorer.", Toast.LENGTH_SHORT
+                        ).show();
                     }
                 }
                 break;
