@@ -45,9 +45,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
     final int GALLERY_REQUEST = 22131;
     final int photoLibraryIntent = 22831;
     final int REQUEST_TAKE_GALLERY_VIDEO = 42831;
-    final int REQUEST_GET_MUSIC =4364454;
+    final int REQUEST_GET_MUSIC = 1;
     String imageName ="";
-    private String selectedImagePath;
+    private String selectedFilePath;
     String selectedPhoto;
 
     SharedPreferences prefs = null;
@@ -344,12 +344,36 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                     Log.i("No Gallery", "request");
                 }
                 break;
-
-            case photoLibraryIntent:
+            case REQUEST_GET_MUSIC:
                 if (resultCode == RESULT_OK) {
+                    Uri uri = data.getData();
+                    selectedFilePath = getPath(uri);
+
+                    if (selectedFilePath != null) {
+                        File f = new File(selectedFilePath);
+                        imageName = f.getName();
+                        Toast.makeText(getApplicationContext(),
+                                "Music " + imageName + " selected", Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                    /*
+                    mMediaPlayer = MediaPlayer.create(mContext, uri);
+
+                    mSeekBar = (SeekBar) findViewById(R.id.SeekBar01);
+                    mSeekBar.setMax(mMediaPlayer.getDuration());
+                    mSeekBar.setOnTouchListener(new OnTouchListener() {
+
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            seekChange(v);
+                            return false;
+                        }
+                    });
+
                     Toast.makeText(getApplicationContext(),
-                            "ahhhhhhhhhhhhhhhhh", Toast.LENGTH_SHORT
+                            "ahhh" + uri, Toast.LENGTH_SHORT
                     ).show();
+                    */
                 }
                 break;
             case REQUEST_TAKE_GALLERY_VIDEO:
@@ -361,9 +385,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                         String filemanagerstring = selectedImageUri.getPath();
 
                         // MEDIA GALLERY
-                        selectedImagePath = getPath(selectedImageUri);
-                        if (selectedImagePath != null) {
-                            File f = new File(selectedImagePath);
+                        selectedFilePath = getPath(selectedImageUri);
+                        if (selectedFilePath != null) {
+                            File f = new File(selectedFilePath);
                             imageName = f.getName();
                             Toast.makeText(getApplicationContext(),
                                     "Video " + imageName + " selected", Toast.LENGTH_SHORT
@@ -401,37 +425,51 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
     void encryptFile(String inputPath,String inputFile, String outputPath) {
         try {
-            //create output directory if it doesn't exist
-            File dir = new File (outputPath);
-            if (!dir.exists())
-            {
-                dir.mkdirs();
-            }
-            // Here you read the cleartext.
-            FileInputStream fis = new FileInputStream(inputPath +"/"+ inputFile);
-            // This stream write the encrypted text. This stream will be wrapped by another stream.
-            FileOutputStream fos = new FileOutputStream(outputPath +"/"+ inputFile);
+            if (inputFile == null){
+                Toast.makeText(getApplicationContext(),
+                        "No file name was given", Toast.LENGTH_SHORT
+                ).show();
+            }else if (inputPath == null) {
+                Toast.makeText(getApplicationContext(),
+                    "No input path was provided", Toast.LENGTH_SHORT
+                ).show();
+            }else if(outputPath == null){
 
-            // Length is 16 byte
-            SecretKeySpec sks = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
-            // Create cipher
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, sks);
-            // Wrap the output stream
-            CipherOutputStream cos = new CipherOutputStream(fos, cipher);
-            // Write bytes
-            int b;
-            byte[] d = new byte[8];
-            while ((b = fis.read(d)) != -1) {
-                cos.write(d, 0, b);
+                Toast.makeText(getApplicationContext(),
+                        "No output path was provided", Toast.LENGTH_SHORT
+                ).show();
+            }else{
+                //create output directory if it doesn't exist
+                File dir = new File(outputPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                // Here you read the cleartext.
+                FileInputStream fis = new FileInputStream(inputPath + "/" + inputFile);
+                // This stream write the encrypted text. This stream will be wrapped by another stream.
+                FileOutputStream fos = new FileOutputStream(outputPath + "/" + inputFile);
+
+                // Length is 16 byte
+                SecretKeySpec sks = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
+                // Create cipher
+                Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.ENCRYPT_MODE, sks);
+                // Wrap the output stream
+                CipherOutputStream cos = new CipherOutputStream(fos, cipher);
+                // Write bytes
+                int b;
+                byte[] d = new byte[8];
+                while ((b = fis.read(d)) != -1) {
+                    cos.write(d, 0, b);
+                }
+                // Flush and close streams.
+                cos.flush();
+                cos.close();
+                fis.close();
+                Toast.makeText(getApplicationContext(),
+                        "file " + inputFile + " encrypted and saved to SD card", Toast.LENGTH_LONG
+                ).show();
             }
-            // Flush and close streams.
-            cos.flush();
-            cos.close();
-            fis.close();
-            Toast.makeText(getApplicationContext(),
-                    "file "+inputFile+" encrypted and saved to SD card", Toast.LENGTH_LONG
-            ).show();
         }catch (Exception e){
             Toast.makeText(getApplicationContext(),
                     "Something went wrong encrypting", Toast.LENGTH_SHORT
