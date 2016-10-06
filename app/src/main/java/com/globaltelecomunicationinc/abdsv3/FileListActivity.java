@@ -43,10 +43,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
     private static final int SELECT_PICTURE = 1;
     final int GALLERY_REQUEST = 22131;
-    final int photoLibraryIntent = 22831;
     final int REQUEST_TAKE_GALLERY_VIDEO = 42831;
     final int REQUEST_GET_MUSIC = 1;
-    String imageName ="";
+    String selectedFileName ="";
     private String selectedFilePath;
     String selectedPhoto;
 
@@ -232,7 +231,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
                                     String outputPath = downloadpath.getAbsolutePath().toString() + "/";
 
-                                    String inputFile = imageName;//TODO:ask for file name to save file as from the user
+                                    String inputFile = selectedFileName;//TODO:ask for file name to save file as from the user
                                     //String inputFile = filename;
                                     //moveFile(inputPath,  inputFile, outputPath);
                                     if(mode == 2){
@@ -322,10 +321,10 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                         File f = new File(photoPath);
                         File file = new File(dir, f.getName());
 
-                        imageName = f.getName();
+                        selectedFileName = f.getName();
 
                         Toast.makeText(getApplicationContext(),
-                                "Image saved to SD Card" + imageName, Toast.LENGTH_SHORT
+                                "Image saved to SD Card" + selectedFileName, Toast.LENGTH_SHORT
                         ).show();
                         try{
                             output = new FileOutputStream(file);
@@ -351,9 +350,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
                     if (selectedFilePath != null) {
                         File f = new File(selectedFilePath);
-                        imageName = f.getName();
+                        selectedFileName = f.getName();
                         Toast.makeText(getApplicationContext(),
-                                "Music " + imageName + " selected", Toast.LENGTH_SHORT
+                                "Music " + selectedFileName + " selected", Toast.LENGTH_SHORT
                         ).show();
                     }
                     /*
@@ -388,9 +387,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                         selectedFilePath = getPath(selectedImageUri);
                         if (selectedFilePath != null) {
                             File f = new File(selectedFilePath);
-                            imageName = f.getName();
+                            selectedFileName = f.getName();
                             Toast.makeText(getApplicationContext(),
-                                    "Video " + imageName + " selected", Toast.LENGTH_SHORT
+                                    "Video " + selectedFileName + " selected", Toast.LENGTH_SHORT
                             ).show();
                         }
                     }
@@ -398,7 +397,6 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
     }
-
 
     /**
      * helper to retrieve the path of an image URI
