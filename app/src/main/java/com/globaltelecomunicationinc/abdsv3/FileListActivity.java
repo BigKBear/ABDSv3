@@ -43,6 +43,10 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
     private static final int SELECT_PICTURE = 1;
     final int GALLERY_REQUEST = 22131;
+    final int photoLibraryIntent = 22831;
+    final int REQUEST_TAKE_GALLERY_VIDEO = 42831;
+    final int REQUEST_GET_MUSIC =4364454;
+    String imageName ="";
     private String selectedImagePath;
     String selectedPhoto;
 
@@ -105,6 +109,44 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             }
         });*/
     }
+/*
+    public String getFileName(){
+        final String[] password = {""};
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(FileListActivity.this);
+        alertDialog.setTitle("File name?");
+        alertDialog.setMessage("Enter File name you want to save the file as");
+
+        final EditText input = new EditText(FileListActivity.this);
+        //final EditText file_name = new EditText(FileListActivity.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+
+
+        //file_name.setLayoutParams(lp);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        //file_name.setInputType(InputType.TYPE_CLASS_TEXT);
+        //alertDialog.setView(input); // uncomment this line
+        alertDialog.setView(input);
+        //alertDialog.setView(file_name);
+        //alertDialog.setIcon(R.drawable.key);
+
+        alertDialog.setPositiveButton("Enter",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        password[0] = input.getText().toString();
+                    }
+                });
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+        return password[0];
+    }*/
 
     @Override
     public void onClick(View view) {
@@ -132,13 +174,15 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                         // Handle no component found here (e.g. show a toast or dialog)
                     }*/
                 Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, 1);
+                startActivityForResult(i, REQUEST_GET_MUSIC);
                 //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
                 break;
             case R.id.btnVideos:
-                Intent photoLibraryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                photoLibraryIntent.setType("video/*");
-                startActivityForResult(photoLibraryIntent, 1);
+                //Intent photoLibraryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent videoLibraryIntent = new Intent();
+                videoLibraryIntent.setType("video/*");
+                videoLibraryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(videoLibraryIntent.createChooser(videoLibraryIntent,"Select Video"),REQUEST_TAKE_GALLERY_VIDEO);
                 //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
                 break;
             case R.id.btnAllFiles:
@@ -184,17 +228,17 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                                     File filepath = Environment.getExternalStorageDirectory();
                                     File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                                     //file name that the images will be saved under
-                                    String inputPath = filepath.getAbsolutePath().toString() + "/ABDStoencode/";
+                                    String inputPath = filepath.getAbsolutePath().toString() + "/ABDSv3Photo/";
 
                                     String outputPath = downloadpath.getAbsolutePath().toString() + "/";
 
-                                    String inputFile = "myimage.png";//TODO:ask for file name to save file as from the user
+                                    String inputFile = imageName;//TODO:ask for file name to save file as from the user
                                     //String inputFile = filename;
                                     //moveFile(inputPath,  inputFile, outputPath);
                                     if(mode == 2){
-                                        encryptFile(inputPath, inputFile, outputPath);
+                                        encryptFile(inputPath, inputFile, outputPath+"/Encrypted");
                                     }else if(mode == 1){
-                                        decryptFile(inputPath, inputFile, outputPath);
+                                        decryptFile(outputPath+"/Encrypted", inputFile, outputPath+"/Decrypted");
                                     }else{
                                         Toast.makeText(getApplicationContext(),
                                                 "Mode not set!", Toast.LENGTH_SHORT).show();
@@ -216,34 +260,13 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                             }
                         });
                 alertDialog.show();
-
-
-               /* if (prefs.getString("password", "").matches(LoginPassword)) {
-                    File filepath = Environment.getExternalStorageDirectory();
-                    File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    //file name that the images will be saved under
-                    String inputPath = filepath.getAbsolutePath().toString() + "/ABDStoencode/";
-
-                    String outputPath = downloadpath.getAbsolutePath().toString() + "/";
-
-                    String inputFile = "myimage.png";
-                    //moveFile(inputPath,  inputFile, outputPath);
-                    if(btnEncryptDecrypt.getText().toString().matches("ENCRYPT")){
-                        encryptFile(inputPath, inputFile, outputPath);
-                    }else{
-                        decryptFile(inputPath, inputFile, outputPath);
-                    }
-                }else{
-                    Toast.makeText(getApplicationContext(),
-                            "passwords did not match", Toast.LENGTH_SHORT
-                    ).show();
-                }*/
                 break;
             default:
                 finish();
                 break;
         }
     }
+
 
     private boolean isExternalStorageAvailable() {
         String state = Environment.getExternalStorageState();
@@ -292,16 +315,17 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                         //ivImage.setImageBitmap(bitmap);
                         File filepath = Environment.getExternalStorageDirectory();
                         //file name that the images will be saved under
-                        File dir = new File(filepath.getAbsolutePath() + "/ABDSv3toencode");
+                        File dir = new File(filepath.getAbsolutePath() + "/ABDSv3Photo");
                         dir.mkdirs();
 
-                        File file = new File(dir, "myimage.png");
+                        //File file = new File(dir, getFileName());
                         File f = new File(photoPath);
+                        File file = new File(dir, f.getName());
 
-                        String imageName = f.getName();
+                        imageName = f.getName();
 
                         Toast.makeText(getApplicationContext(),
-                                "Image saved to SD Card", Toast.LENGTH_SHORT
+                                "Image saved to SD Card" + imageName, Toast.LENGTH_SHORT
                         ).show();
                         try{
                             output = new FileOutputStream(file);
@@ -320,40 +344,37 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                     Log.i("No Gallery", "request");
                 }
                 break;
+
+            case photoLibraryIntent:
+                if (resultCode == RESULT_OK) {
+                    Toast.makeText(getApplicationContext(),
+                            "ahhhhhhhhhhhhhhhhh", Toast.LENGTH_SHORT
+                    ).show();
+                }
+                break;
+            case REQUEST_TAKE_GALLERY_VIDEO:
+                if (resultCode == RESULT_OK) {
+                    if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+                        Uri selectedImageUri = data.getData();
+
+                        // OI FILE Manager
+                        String filemanagerstring = selectedImageUri.getPath();
+
+                        // MEDIA GALLERY
+                        selectedImagePath = getPath(selectedImageUri);
+                        if (selectedImagePath != null) {
+                            File f = new File(selectedImagePath);
+                            imageName = f.getName();
+                            Toast.makeText(getApplicationContext(),
+                                    "Video " + imageName + " selected", Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+                }
+                break;
         }
     }
-/*
 
-    public String getFileName(){
-        alertDialog.setPositiveButton("Enter",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String filename = input.getText().toString();
-                        //if (password.matches("")) {
-                        if (prefs.getString("filename", "").matches("")) {
-                            return filename;
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "no file name provided!", Toast.LENGTH_SHORT).show();
-                        }
-                               */
-/* }else {
-                                    Toast.makeText(getApplicationContext(),
-                                            "No Password Entered!", Toast.LENGTH_SHORT).show();
-                                }*//*
-
-                    }
-                });
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        alertDialog.show();
-
-    }
-*/
 
     /**
      * helper to retrieve the path of an image URI
@@ -378,7 +399,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         return uri.getPath();
     }
 
-    void encryptFile(String inputPath, String inputFile, String outputPath) {
+    void encryptFile(String inputPath,String inputFile, String outputPath) {
         try {
             //create output directory if it doesn't exist
             File dir = new File (outputPath);
@@ -423,7 +444,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         try {
             FileInputStream fis = new FileInputStream(outputPath +"/"+ inputFile);
 
-            FileOutputStream fos = new FileOutputStream(inputPath +"/decrypted" + inputFile );
+            FileOutputStream fos = new FileOutputStream(inputPath +"/" + inputFile );
             SecretKeySpec sks = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, sks);
