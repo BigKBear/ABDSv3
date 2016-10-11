@@ -27,7 +27,7 @@
             android:background="@null"
             android:text="All unsename Files"
             android:textColor="#000000"
-            android:textSize="30sp" />
+            android:textSize="18sp" />
 
         <LinearLayout
             android:id="@+id/action_on_files"
@@ -55,69 +55,7 @@
 
         </LinearLayout>
 
-        <GridLayout
-            android:id="@+id/gridLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_above="@+id/btnEncryptDecrypt"
-            android:layout_below="@+id/action_on_files">
-
-            <ImageView
-                android:id="@+id/ivGallery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill"
-                android:layout_row="0"
-                android:layout_rowWeight="1"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:tag="0" />
-
-            <Button
-                android:id="@+id/btnMusic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill"
-                android:layout_row="1"
-                android:layout_rowWeight="1"
-                android:background="#c76ce5"
-                android:tag="2"
-                android:text="Music"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/btnVideos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill"
-                android:layout_row="0"
-                android:layout_rowWeight="1"
-                android:background="#6ce574"
-                android:tag="1"
-                android:text="Videos"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/btnAllFiles"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_columnWeight="1"
-                android:layout_gravity="fill"
-                android:layout_row="1"
-                android:layout_rowWeight="1"
-                android:background="#6c98e5"
-                android:tag="3"
-                android:text="All files"
-                android:textSize="20sp" />
-        </GridLayout>
-
-        <Button
+    <Button
             android:id="@+id/btnEncryptDecrypt"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -125,4 +63,68 @@
             android:layout_centerHorizontal="true"
             android:text="Encrypt/Decrypt" />
 
-    </RelativeLayout>
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/action_on_files"
+        android:layout_above="@+id/btnEncryptDecrypt"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/ivGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:layout_row="0"
+            android:layout_rowWeight="1"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:tag="0" />
+
+        <Button
+            android:id="@+id/btnMusic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:layout_row="1"
+            android:layout_rowWeight="1"
+            android:background="#c76ce5"
+            android:tag="2"
+            android:text="Music"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnVideos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:layout_row="0"
+            android:layout_rowWeight="1"
+            android:background="#6ce574"
+            android:tag="1"
+            android:text="Videos"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnAllFiles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnWeight="1"
+            android:layout_gravity="fill"
+            android:layout_row="1"
+            android:layout_rowWeight="1"
+            android:background="#6c98e5"
+            android:tag="3"
+            android:text="All files"
+            android:textSize="20sp" />
+    </GridLayout>
+
+</RelativeLayout>
