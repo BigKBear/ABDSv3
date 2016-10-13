@@ -54,7 +54,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
     SharedPreferences prefs = null;
     //Lets us know if we are in encryption mode or decryption mode
-    int mode;
+    int mode = 2;
 
     ImageView ivGallery;
     GalleryPhoto galleryPhoto;
@@ -92,146 +92,251 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         initViews();
         setListeners();
 
+        Environment.getExternalStorageDirectory();
+
+        File folder1 = new File(Environment.getExternalStorageDirectory() + "/map");
+        boolean success = true;
+        if (!folder1.exists()) {
+            success = folder1.mkdir();
+        }
+        if (success) {
+            // Do something on success
+            Toast.makeText(getApplicationContext(),"SDcard Folder created "+ folder1.getPath(),Toast.LENGTH_LONG).show();
+        } else {
+            // Do something else on failure
+            Toast.makeText(getApplicationContext(),"SDcard Folder ALREADY exists ",Toast.LENGTH_LONG).show();
+        }
+
+        //First check if the sd card is mounted or not
+        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED))
+        {
+            // sd card mounted
+            Log.d("SDCard", "SDcard is present");
+            Toast.makeText(getApplicationContext(),"SDcard is present",Toast.LENGTH_LONG).show();
+        }
+
+        File folder = new File(Environment.getExternalStorageDirectory() + File.separator +"ABDSv3/");
+        if(!folder.exists())
+
+        {
+            folder.mkdirs();
+            Log.d("SDcard", "Folder created");
+            Toast.makeText(getApplicationContext(),"SDcard Folder created "+ folder.getPath(),Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            Log.d("SDCard", "Folder already exists");
+            Toast.makeText(getApplicationContext(),"SDcard Folder ALREADY exists "+ folder.getPath(),Toast.LENGTH_LONG).show();
+        }
 
         prefs = this.getSharedPreferences("com.globaltelecomunicationinc.abdsv3", MODE_PRIVATE);
-        mode = 2;
         btnEncryptDecrypt.setText("Decrypt");
 
         tvFileListLabel.setGravity(Gravity.CENTER_HORIZONTAL);
         if (mode == 2) {
-            tvFileListLabel.setText(prefs.getString("username", "") + "'s Decrypted files");
+            tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Decrypted files");
             btnEncryptDecrypt.setText("Encrypt");
-        } else {
-            tvFileListLabel.setText(prefs.getString("username", "") + "'s Encrypted files");
+        } else if(mode ==1 ) {
+            tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Encrypted files");
             btnEncryptDecrypt.setText("Decrypt");
+        }else{
+            Toast.makeText(getApplicationContext(),
+                    "Mode not set restart the app!", Toast.LENGTH_SHORT).show();
         }
     }
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+
             case R.id.btnEncryptedFiles:
                 mode = 1;
-                tvFileListLabel.setText(prefs.getString("username", "") + "'s Encrypted files");
+                tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Encrypted files");
                 btnEncryptDecrypt.setText("Decrypt");
                 break;
+
             case R.id.btnDencryptedFiles:
                 mode = 2;
                 tvFileListLabel.setText("All " + prefs.getString("username", "") + "'s Decrypted files");
                 btnEncryptDecrypt.setText("Encrypt");
                 break;
-            case R.id.ivGallery:
-                startActivityForResult(galleryPhoto.openGalleryIntent(), GALLERY_REQUEST);
-                //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
-                break;
-            case R.id.btnMusic:
-                /*try {
-                    Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
-                    startActivity(intent);
-                }
-                    catch (ActivityNotFoundException anfe) {
-                        // Handle no component found here (e.g. show a toast or dialog)
-                    }*/
-                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, REQUEST_GET_MUSIC);
-                //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
-                break;
-            case R.id.btnVideos:
-                //Intent photoLibraryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                Intent videoLibraryIntent = new Intent();
-                videoLibraryIntent.setType("video/*");
-                videoLibraryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(videoLibraryIntent.createChooser(videoLibraryIntent,"Select Video"),REQUEST_TAKE_GALLERY_VIDEO);
-                //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
-                break;
-            case R.id.btnAllFiles:
-                //Set all files for encryption
-                if(isExternalStorageAvailable()){
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("*/*");
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-                    try {
-                        startActivityForResult(
-                                Intent.createChooser(intent, "Select a File to Upload"),
-                                FILE_SELECT_CODE);
-                    } catch (android.content.ActivityNotFoundException ex) {
+            case R.id.ivGallery:
+                if(mode == 2){
+                    startActivityForResult((galleryPhoto.openGalleryIntent()), GALLERY_REQUEST);
+                    //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
+                }else if(mode == 1){
+                    //Open encrypted Photos only
+                    Toast.makeText(getApplicationContext(),
+                            "Show encrypted Photos only", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),
+                            "Mode not set!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case R.id.btnMusic:
+                if(mode == 2){
+                    Intent musicLibraryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(musicLibraryIntent.createChooser(musicLibraryIntent,"Select Music file to Encrypt"), REQUEST_GET_MUSIC);
+                    //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
+                }else if(mode == 1){
+                    //Open encrypted Music only
+                    Toast.makeText(getApplicationContext(),
+                            "Show encrypted Music only", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),
+                            "Mode not set!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case R.id.btnVideos:
+                if(mode == 2){
+                    //Intent photoLibraryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    Intent videoLibraryIntent = new Intent();
+                    videoLibraryIntent.setType("video/*");
+                    videoLibraryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                    try{
+                        startActivityForResult(videoLibraryIntent.createChooser(videoLibraryIntent,"Select Video file to Encrypt"),REQUEST_TAKE_GALLERY_VIDEO);
+                        //TODO: copy selected file to selected for encryption folder in the ABDSv2 if mode is 2(decrypted files seen)
+                    }catch(android.content.ActivityNotFoundException ex) {
                         // Potentially direct the user to the Market with a Dialog
                         Toast.makeText(this, "Please install a File Manager.",
                                 Toast.LENGTH_SHORT).show();
                     }
+                }else if(mode == 1){
+                    //Open encrypted Videos only
+                    Toast.makeText(getApplicationContext(),
+                            "Show encrypted Videos only", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getApplicationContext(),
-                            "NO SDcard", Toast.LENGTH_SHORT
-                    ).show();
+                            "Mode not set!", Toast.LENGTH_SHORT).show();
                 }
                 break;
+
+            case R.id.btnAllFiles:
+                if(mode == 2){
+                    //Set all files for encryption
+                    if(isExternalStorageAvailable()){
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("*/*");
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        try {
+                            startActivityForResult(
+                                    Intent.createChooser(intent, "Select a File to Encrypt"),
+                                    FILE_SELECT_CODE);
+                        } catch (android.content.ActivityNotFoundException ex) {
+                            // Potentially direct the user to the Market with a Dialog
+                            Toast.makeText(this, "Please install a File Manager.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(getApplicationContext(),
+                                "NO SDcard Present", Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }else if(mode == 1){
+                    //Open encrypted folder with files of each type
+                    Toast.makeText(getApplicationContext(),
+                            "Show all encrypted Files only", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),
+                            "Mode not set!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
             case R.id.btnEncryptDecrypt:
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(FileListActivity.this);
-                alertDialog.setTitle("PASSWORD");
-                alertDialog.setMessage("Enter Password");
+                File folder = new File(Environment.getExternalStorageDirectory() + File.separator +"ABDSv3/");
+                // create a File object for the parent directory
+                File wallpaperDirectory = new File(Environment.getExternalStorageDirectory().toString()+"/ABDSv3");
+                // have the object build the directory structure, if needed.
+                wallpaperDirectory.mkdirs();
 
-                final EditText input = new EditText(FileListActivity.this);
-                //final EditText file_name = new EditText(FileListActivity.this);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
-                input.setLayoutParams(lp);
+                if(!wallpaperDirectory.exists())
+                {if (!wallpaperDirectory.mkdirs()) {
+
+                    Toast.makeText(getApplicationContext(),"SDcard Folder"+
+                            Environment.getExternalStorageDirectory() + File.separator +"ABDSv3/"
+                            +"Does not exist.",Toast.LENGTH_LONG).show();
+                }}else {
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(FileListActivity.this);
+                    alertDialog.setTitle("PASSWORD");
+                    alertDialog.setMessage("Enter Password");
+
+                    final EditText input = new EditText(FileListActivity.this);
+                    //final EditText file_name = new EditText(FileListActivity.this);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.MATCH_PARENT);
+                    input.setLayoutParams(lp);
 
 
-                //file_name.setLayoutParams(lp);
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                //file_name.setInputType(InputType.TYPE_CLASS_TEXT);
-                //alertDialog.setView(input); // uncomment this line
-                alertDialog.setView(input);
-                //alertDialog.setView(file_name);
-                alertDialog.setIcon(R.drawable.key);
+                    //file_name.setLayoutParams(lp);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    //file_name.setInputType(InputType.TYPE_CLASS_TEXT);
+                    //alertDialog.setView(input); // uncomment this line
+                    alertDialog.setView(input);
+                    //alertDialog.setView(file_name);
+                    alertDialog.setIcon(R.drawable.key);
 
-                alertDialog.setPositiveButton("Enter",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                String password = input.getText().toString();
-                                //String filename = file_name.getText().toString();
-                                //if (password.matches("")) {
-                                if (prefs.getString("password", "").matches(password)) {
-                                    File filepath = Environment.getExternalStorageDirectory();
-                                    File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                                    //file name that the images will be saved under
-                                    String inputPath = filepath.getAbsolutePath().toString() + "/ABDSv3Photo/";
+                    alertDialog.setPositiveButton("Enter",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String password = input.getText().toString();
+                                    //String filename = file_name.getText().toString();
+                                    //if (password.matches("")) {
+                                    if (prefs.getString("password", "").matches(password)) {
+                                        File filepath = Environment.getExternalStorageDirectory();
+                                        File downloadpath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                                        //file name that the images will be saved under
+                                        String inputPath = filepath.getAbsolutePath().toString() + "/ABDSv3";
 
-                                    String outputPath = downloadpath.getAbsolutePath().toString() + "/";
+                                        String outputPath = downloadpath.getAbsolutePath().toString() + "/";
 
-                                    String inputFile = selectedFileName;//TODO:ask for file name to save file as from the user
-                                    //String inputFile = filename;
-                                    //moveFile(inputPath,  inputFile, outputPath);
-                                    if(mode == 2){
-                                        encryptFile(inputPath, inputFile, outputPath+"/Encrypted/");
-                                    }else if(mode == 1){
-                                        decryptFile(outputPath, inputFile, outputPath+"/Decrypted/");
-                                    }else{
+                                        String inputFile = selectedFileName;//TODO:ask for file name to save file as from the user
+                                        //String inputFile = filename;
+                                        //moveFile(inputPath,  inputFile, outputPath);
+                                        if (mode == 2) {
+                                            encryptFile(inputPath, inputFile, outputPath + "/Encrypted/");
+                                        } else if (mode == 1) {
+                                            decryptFile(outputPath, inputFile, outputPath + "/Decrypted/");
+                                        } else {
+                                            Toast.makeText(getApplicationContext(),
+                                                    "Mode not set!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
                                         Toast.makeText(getApplicationContext(),
-                                                "Mode not set!", Toast.LENGTH_SHORT).show();
+                                                "Wrong Password!", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(getApplicationContext(),
-                                            "Wrong Password!", Toast.LENGTH_SHORT).show();
-                                }
                                /* }else {
                                     Toast.makeText(getApplicationContext(),
                                             "No Password Entered!", Toast.LENGTH_SHORT).show();
                                 }*/
-                            }
-                        });
-                alertDialog.setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
-                alertDialog.show();
+                                }
+                            });
+                    alertDialog.setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                    alertDialog.show();
+                }
                 break;
             default:
                 finish();
                 break;
+        }
+    }
+
+    public void CheckIfFileExistAndCreateIT(File file){
+        boolean success = true;
+        if (!file.exists()) {
+            success = file.mkdirs();
+        }
+        if (success) {
+            // Do something on success
+        } else {
+            // Do something else on failure
         }
     }
 
@@ -242,45 +347,55 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             // Displays all the photos a user has on their device for them to select one
             case GALLERY_REQUEST:
                 if (resultCode == RESULT_OK) {
-                    Bitmap bitmap = null;
-                    Uri selectedImageUri = data.getData();
-                    String photoPath = getPath(selectedImageUri).toString();
-                    selectedFileName = photoPath;
-                    try{
-                        bitmap = ImageLoader.init().from(selectedFileName).requestSize(512, 512).getBitmap();
-                        //ivImage.setImageBitmap(bitmap);
-                        File filepath = Environment.getExternalStorageDirectory();
-                        //file name that the images will be saved under
-                        File dir = new File(filepath.getAbsolutePath() + "/ABDSv3Photo");
-                        dir.mkdirs();
-
-                        //File file = new File(dir, getFileName());
-                        File f = new File(photoPath);
-
-                        File file = new File(dir, f.getName());
-
-                        selectedFileName = f.getName();
-
-                        Toast.makeText(getApplicationContext(),
-                                "Image saved to SD Card" + selectedFileName, Toast.LENGTH_SHORT
-                        ).show();
-                        //Saves the selected image to the ABDSv3Photo folder
+                    if(mode == 2){
+                        Bitmap bitmap = null;
+                        Uri selectedImageUri = data.getData();
+                        String photoPath = getPath(selectedImageUri).toString();
+                        selectedFileName = photoPath;
                         try{
-                            output = new FileOutputStream(file);
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
-                            output.flush();
-                            output.close();
+                            bitmap = ImageLoader.init().from(selectedFileName).requestSize(512, 512).getBitmap();
+                            //ivImage.setImageBitmap(bitmap);
+                            File filepath = Environment.getExternalStorageDirectory();
+                            Log.d("FileListActivity", "Can write: " + Environment.getExternalStorageDirectory().canWrite());
+                            //file name that the images will be saved under
+                            File dir = new File(filepath.getAbsolutePath() +"/ABDSv3");
+                            dir.mkdirs();
+
+
+                            //File file = new File(dir, getFileName());
+                            File f = new File(photoPath);
+
+                            File file = new File(dir, f.getName());
+
+                            selectedFileName = f.getName();
+
+                            Toast.makeText(getApplicationContext(),
+                                    "Image saved to SD Card" + selectedFileName+ "  "+ file.canRead()+ "  "+file.canWrite(), Toast.LENGTH_SHORT
+                            ).show();
+                            //Saves the selected image to the ABDSv3 folder
+                            try{
+                                output = new FileOutputStream(file);
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+                                output.flush();
+                                output.close();
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                Toast.makeText(getApplicationContext(),
+                                        "Something went wrong while saving the photo", Toast.LENGTH_SHORT
+                                ).show();
+                            }
                         }catch (Exception e){
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(),
-                                    "Something went wrong while saving the photo", Toast.LENGTH_SHORT
+                                    "Something went wrong while selecting the photo", Toast.LENGTH_SHORT
                             ).show();
                         }
-                    }catch (Exception e){
-                        e.printStackTrace();
+                    }else if(mode == 1){
+                        //Open encrypted Photos only
+
+                    }else{
                         Toast.makeText(getApplicationContext(),
-                                "Something went wrong while selecting the photo", Toast.LENGTH_SHORT
-                        ).show();
+                                "Mode not set!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.i("No Gallery", "request");
@@ -289,27 +404,35 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             // Displays all the music a user has on their device for them to select one
             case REQUEST_GET_MUSIC:
                 if (resultCode == RESULT_OK) {
-                    Uri selectedMusicUri = data.getData();
-                    selectedFilePath = getPath(selectedMusicUri);
-                    try{
-                        if (selectedFilePath != null) {
-                            File f = new File(selectedFilePath);
-                            selectedFileName = f.getName();
+                    if(mode == 2){
+                        Uri selectedMusicUri = data.getData();
+                        selectedFilePath = getPath(selectedMusicUri);
+                        try{
+                            if (selectedFilePath != null) {
+                                File f = new File(selectedFilePath);
+                                selectedFileName = f.getName();
+                                Toast.makeText(getApplicationContext(),
+                                        "Music " + selectedFileName + " selected", Toast.LENGTH_SHORT
+                                ).show();
+                            }else{
+                                Toast.makeText(getApplicationContext(),
+                                        "You have not selected a file with a valid location.", Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
                             Toast.makeText(getApplicationContext(),
-                                    "Music " + selectedFileName + " selected", Toast.LENGTH_SHORT
-                            ).show();
-                        }else{
-                            Toast.makeText(getApplicationContext(),
-                                    "You have not selected a file with a valid location.", Toast.LENGTH_SHORT
+                                    "Something went wrong while selecting the music", Toast.LENGTH_SHORT
                             ).show();
                         }
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
+                    }else if(mode == 1){
+                        //Open encrypted Music only
+                    }else{
                         Toast.makeText(getApplicationContext(),
-                                "Something went wrong while selecting the music", Toast.LENGTH_SHORT
-                        ).show();
+                                "Mode not set!", Toast.LENGTH_SHORT).show();
                     }
+
                 } else {
                     Log.i("No Music", "request");
                 }
@@ -318,7 +441,7 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             // Displays all the videos a user has on their device for them to select one
             case REQUEST_TAKE_GALLERY_VIDEO:
                 if (resultCode == RESULT_OK) {
-                    if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+                    if(mode == 2){
                         Uri selectedVideoUri = data.getData();
 
                         // OI FILE Manager
@@ -342,8 +465,15 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                                     "Something went wrong while selecting the video", Toast.LENGTH_SHORT
                             ).show();
                         }
+                    }else if(mode == 1){
+                        //Open encrypted Video only
 
+                    }else{
+                        Toast.makeText(getApplicationContext(),
+                                "Mode not set!", Toast.LENGTH_SHORT).show();
                     }
+
+
                 } else {
                     Log.i("No Video", "request");
                 }
@@ -352,19 +482,36 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             //use the File explorer the user has on their device to select a file for encryption or decryption for them to select one
             case FILE_SELECT_CODE:
                 if (resultCode == RESULT_OK) {
-                    // Get the Uri of the selected file
-                    Uri uri = data.getData();
-                    Log.e("TAG", "File Uri: " + uri.toString());
-                    // Get the path
-                    selectedFilePath = getPath(uri);
-                    Log.e("TAG", "File Path: " + selectedFilePath);
-                    if (selectedFilePath != null) {
-                        // Get the file instance
-                        File f = new File(selectedFilePath);
-                        selectedFileName = f.getName();
+                    if(mode == 2){
+                        try{
+                            // Get the Uri of the selected file
+                            Uri uri = data.getData();
+                            Log.e("TAG", "File Uri: " + uri.toString());
+                            // Get the path
+                            selectedFilePath = getPath(uri);
+                            Log.e("TAG", "File Path: " + selectedFilePath);
+                            if (selectedFilePath != null) {
+                                // Get the file instance
+                                File f = new File(selectedFilePath);
+                                selectedFileName = f.getName();
+                                Toast.makeText(getApplicationContext(),
+                                        "User selected " + selectedFileName + " file from file explorer.", Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(),
+                                    "Something went wrong while selecting the video", Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }else if(mode == 1){
+                        //Open encrypted files folder only
                         Toast.makeText(getApplicationContext(),
-                                "User selected " + selectedFileName + " file from file explorer.", Toast.LENGTH_SHORT
+                                "Write code to open encrypted files folder", Toast.LENGTH_SHORT
                         ).show();
+                    }else{
+                        Toast.makeText(getApplicationContext(),
+                                "Mode not set!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.i("No File", "request");
@@ -457,10 +604,10 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 FileOutputStream fos = new FileOutputStream(outputPath + inputFile);
 
                 // Length is 16 byte
-                SecretKeySpec sks = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
+                SecretKeySpec secretKey = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
                 // Create cipher
                 Cipher cipher = Cipher.getInstance("AES");
-                cipher.init(Cipher.ENCRYPT_MODE, sks);
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
                 // Wrap the output stream
                 CipherOutputStream cos = new CipherOutputStream(fos, cipher);
                 // Write bytes
@@ -490,9 +637,9 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
             FileInputStream fis = new FileInputStream(outputPath + inputFile);
 
             FileOutputStream fos = new FileOutputStream(inputPath + inputFile );
-            SecretKeySpec sks = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
+            SecretKeySpec secretKey = new SecretKeySpec("MyDifficultPassw".getBytes(), "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, sks);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
             CipherInputStream cis = new CipherInputStream(fis, cipher);
             int b;
             byte[] d = new byte[8];
@@ -634,5 +781,4 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
         setListAdapter(directoryList);
     }
     */
-
 }
