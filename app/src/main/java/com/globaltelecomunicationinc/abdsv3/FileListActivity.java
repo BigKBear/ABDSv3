@@ -252,12 +252,11 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                 wallpaperDirectory.mkdirs();
 
                 if(!wallpaperDirectory.exists())
-                {if (!wallpaperDirectory.mkdirs()) {
-
+                {
                     Toast.makeText(getApplicationContext(),"SDcard Folder"+
                             Environment.getExternalStorageDirectory() + File.separator +"ABDSv3/"
                             +"Does not exist.",Toast.LENGTH_LONG).show();
-                }}else {
+                }else {
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(FileListActivity.this);
                     alertDialog.setTitle("PASSWORD");
                     alertDialog.setMessage("Enter Password");
@@ -361,7 +360,6 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
                             File dir = new File(filepath.getAbsolutePath() +"/ABDSv3");
                             dir.mkdirs();
 
-
                             //File file = new File(dir, getFileName());
                             File f = new File(photoPath);
 
@@ -369,21 +367,21 @@ public class FileListActivity extends AppCompatActivity implements View.OnClickL
 
                             selectedFileName = f.getName();
 
-                            Toast.makeText(getApplicationContext(),
-                                    "Image saved to SD Card" + selectedFileName+ "  "+ file.canRead()+ "  "+file.canWrite(), Toast.LENGTH_SHORT
-                            ).show();
                             //Saves the selected image to the ABDSv3 folder
-                            try{
+                            /*try{*/
                                 output = new FileOutputStream(file);
                                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
                                 output.flush();
                                 output.close();
-                            }catch (Exception e){
+                            /*}catch (Exception e){
                                 e.printStackTrace();
                                 Toast.makeText(getApplicationContext(),
                                         "Something went wrong while saving the photo", Toast.LENGTH_SHORT
                                 ).show();
-                            }
+                            }*/
+                            Toast.makeText(getApplicationContext(),
+                                    "Image saved to SD Card" + selectedFileName+ "  "+ file.canRead()+ "  "+file.canWrite(), Toast.LENGTH_SHORT
+                            ).show();
                         }catch (Exception e){
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(),

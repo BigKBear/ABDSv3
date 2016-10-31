@@ -3,6 +3,7 @@ package com.globaltelecomunicationinc.abdsv3;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
 
 public class LoginActivity extends AppCompatActivity {
     SharedPreferences prefs;
@@ -25,6 +28,19 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        File folder= new File(Environment.getExternalStorageDirectory() + "/map");
+        boolean success = true;
+        if (!folder.exists()) {
+            success = folder.mkdir();
+        }
+        if (success) {
+            // Do something on success
+            Toast.makeText(getApplicationContext(),"SDcard Folder created "+ folder.getPath(),Toast.LENGTH_LONG).show();
+        } else {
+            // Do something else on failure
+            Toast.makeText(getApplicationContext(),"SDcard Folder ALREADY exists " + folder.getPath(),Toast.LENGTH_LONG).show();
+        }
 
         prefs = this.getSharedPreferences("com.globaltelecomunicationinc.abdsv3", MODE_PRIVATE);
 
